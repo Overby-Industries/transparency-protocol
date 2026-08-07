@@ -4,6 +4,21 @@ OTB‑1 defines the standard JSON schema for publicly reporting business expendi
 ## 🌍 Purpose
 This format allows investors, regulators, and the public to transparently verify WHERE funds are spent and WHAT assets are acquired in pursuit of Overby’s roadmap (airfields, hangars, labs, materials).
 
+## ✅ Formal Schema & Validation
+
+This spec is now a real, enforceable [JSON Schema](schema/otb-1.schema.json)
+(Draft 2020-12), with the three examples below as runnable files in
+[`examples/`](examples/) and a validator in [`tools/validate.py`](tools/validate.py):
+
+```bash
+pip install jsonschema
+python tools/validate.py                 # validates everything under examples/
+python tools/validate.py my-ledger-entry.json
+```
+
+CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) runs
+this on every push and PR.
+
 ## 🧩 Core OTB‑1 JSON Schema
 ```json
 {

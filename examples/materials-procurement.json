@@ -1,0 +1,22 @@
+{
+  "version": "OTB-1",
+  "timestamp": "2025-04-20T12:00:00Z",
+  "investment": {
+    "id": "INV-2025-0003",
+    "type": "materials",
+    "item": "100 tons aerospace-grade steel feedstock",
+    "status": "procurement"
+  },
+  "financials": {
+    "costUSD": 750000,
+    "vendor": "StarMetals Incorporated",
+    "fundingSource": "Supporter Pool B"
+  },
+  "location": {
+    "site": "Gulf Coast Depot"
+  },
+  "certifications": {
+    "OTB_Audit": true,
+    "ProofOfInvestmentToken": "0xinv20250003"
+  }
+}

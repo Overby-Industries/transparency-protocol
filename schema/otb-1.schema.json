@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Overby-Industries/transparency-protocol/schema/otb-1.schema.json",
+  "title": "OTB-1 (Overby Transparency for Business v1)",
+  "description": "Schema for publicly reporting Overby Industries expenditures, infrastructure projects, and material procurements. See README.md for the full field-by-field rationale.",
+  "type": "object",
+  "required": ["version", "timestamp", "investment", "financials", "location", "certifications"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "OTB-1"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO timestamp of purchase/contract execution."
+    },
+    "investment": {
+      "type": "object",
+      "required": ["id", "type", "item", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^INV-[0-9]{4}-[0-9]{4,}$" },
+        "type": {
+          "type": "string",
+          "enum": ["land", "facility", "materials", "equipment", "services"]
+        },
+        "item": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["planned", "in-progress", "procurement", "completed"]
+        }
+      }
+    },
+    "financials": {
+      "type": "object",
+      "required": ["costUSD", "vendor", "fundingSource"],
+      "additionalProperties": false,
+      "properties": {
+        "costUSD": { "type": "number", "minimum": 0 },
+        "vendor": { "type": "string" },
+        "fundingSource": { "type": "string" }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": ["site"],
+      "additionalProperties": false,
+      "properties": {
+        "site": { "type": "string" },
+        "coordinates": {
+          "type": "object",
+          "required": ["lat", "lon"],
+          "additionalProperties": false,
+          "properties": {
+            "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+            "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+          }
+        }
+      }
+    },
+    "certifications": {
+      "type": "object",
+      "required": ["OTB_Audit"],
+      "additionalProperties": false,
+      "properties": {
+        "SMESSC_Applicable": {
+          "type": "boolean",
+          "description": "True if this investment links to operational sustainability certification (mining/facility ops)."
+        },
+        "OTB_Audit": {
+          "type": "boolean",
+          "description": "True once this entry has been verified by Overby internal/external auditors."
+        },
+        "ProofOfInvestmentToken": {
+          "type": "string",
+          "description": "Blockchain token id proving this line item exists in the ledger."
+        }
+      }
+    }
+  }
+}
