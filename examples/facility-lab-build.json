@@ -1,0 +1,22 @@
+{
+  "version": "OTB-1",
+  "timestamp": "2025-04-02T17:30:00Z",
+  "investment": {
+    "id": "INV-2025-0002",
+    "type": "facility",
+    "item": "Advanced R&D Manufacturing Lab, Phase 1",
+    "status": "in-progress"
+  },
+  "financials": {
+    "costUSD": 15000000,
+    "vendor": "Stellar Construction Group",
+    "fundingSource": "Seed Investment A"
+  },
+  "location": {
+    "site": "Houston Space Tech Park"
+  },
+  "certifications": {
+    "OTB_Audit": true,
+    "ProofOfInvestmentToken": "0xinv20250002"
+  }
+}
