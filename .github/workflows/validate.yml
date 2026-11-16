@@ -24,3 +24,6 @@ jobs:
 
       - name: Validate all examples against the OTB-1 schema
         run: python tools/validate.py
+
+      - name: Confirm every malformed record in tests/invalid is rejected
+        run: python tools/validate.py --expect-invalid tests/invalid

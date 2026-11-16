@@ -13,7 +13,8 @@
     "timestamp": {
       "type": "string",
       "format": "date-time",
-      "description": "UTC ISO timestamp of purchase/contract execution."
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+      "description": "UTC ISO timestamp of purchase/contract execution. An RFC 3339 instant, such as 2025-03-14T14:00:00Z: uppercase T and Z, fractional seconds optional, and a numeric offset such as +01:00 allowed in place of Z. The pattern is stated as well as the format because many validators do not enforce format; it fixes the shape, and a conforming implementation also checks that the date and time are real."
     },
     "investment": {
       "type": "object",
