@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Version-OTB--1-blue?style=for-the-badge&logo=github)](schema/otb-1.schema.json)
 [![Validate](https://img.shields.io/github/actions/workflow/status/Overby-Industries/transparency-protocol/validate.yml?branch=main&style=for-the-badge&label=Validate&logo=githubactions&logoColor=white)](https://github.com/Overby-Industries/transparency-protocol/actions/workflows/validate.yml)
+[![C++](https://img.shields.io/github/actions/workflow/status/Overby-Industries/transparency-protocol/cpp.yml?branch=main&style=for-the-badge&label=C%2B%2B%2017&logo=cplusplus&logoColor=white)](https://github.com/Overby-Industries/transparency-protocol/actions/workflows/cpp.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-lightgrey?style=for-the-badge&logo=apache)](LICENSE)
 [![JSON Schema](https://img.shields.io/badge/JSON_Schema-Draft_2020--12-purple?style=for-the-badge&logo=json)](https://json-schema.org/draft/2020-12/release-notes)
 [![Certification](https://img.shields.io/badge/Certification-OTB_Audit_%7C_PoI-green?style=for-the-badge)](#certifications--extensions)
@@ -24,10 +25,107 @@ This spec is now a real, enforceable [JSON Schema](schema/otb-1.schema.json)
 pip install jsonschema
 python tools/validate.py                 # validates everything under examples/
 python tools/validate.py my-ledger-entry.json
+python tools/validate.py ledger-2025.jsonl               # a ledger file: one record per line
+python tools/validate.py --expect-invalid tests/invalid  # every one must be rejected
 ```
 
-CI ([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) runs
-this on every push and PR.
+[`tests/invalid/`](tests/invalid/) holds one malformed record per file, each
+broken in exactly one way. CI
+([`.github/workflows/validate.yml`](.github/workflows/validate.yml)) runs
+both checks on every push and PR, so a schema change that breaks a good
+example, or that quietly starts accepting a bad record, gets caught before
+it merges.
+
+The validator checks two things a JSON Schema validator usually leaves
+alone. A timestamp must be a real instant, so `2025-02-30T00:00:00Z` is
+rejected. And an investment id must match its pattern to the very end of
+the string, so `INV-2025-0001` followed by a stray newline is rejected too.
+
+## C++ Reference Implementation
+
+[`cpp/`](cpp/) holds **libotb1**: the same format as a C++ value, with two
+functions that turn it into bytes and back. C++17, no dependencies beyond
+the standard library.
+
+```cpp
+#include <otb1/otb1.hpp>
+
+otb1::Record record;
+record.timestamp = 1741960800000;               // 2025-03-14T14:00:00Z
+record.investment = {"INV-2025-0001", otb1::InvestmentType::Land,
+                     "50 acres for Overby Airfield Development",
+                     otb1::InvestmentStatus::Completed};
+record.financials = {2200000.0, "AeroLand Realty LLC", "Early Supporter Funds"};
+record.location.site = "West Texas";
+record.certifications.otbAudit = true;
+
+std::string why;
+if (!otb1::validate(record, &why)) {
+    // Not publishable. `why` names the field, for example
+    // "investment/id must look like INV-2025-0001".
+}
+std::string text = otb1::encode(record);        // one line of compact JSON
+
+otb1::Record read;
+if (otb1::decode(text, read, &why)) {
+    // read.financials.costUsd, read.certifications.otbAudit, ...
+}
+```
+
+`decode()` applies the schema's rules in C++: required fields, closed enums,
+value ranges, the investment id's form, real timestamps, no unknown fields.
+A program built on it never publishes or acts on a record the schema would
+reject.
+
+An optional field that was left out stays left out. A record that does not
+say whether SMESSC applies is not read back as saying it does not.
+
+**Build and test:**
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+**Use it from another CMake project:**
+
+```cmake
+add_subdirectory(path/to/transparency-protocol)
+target_link_libraries(your_target PRIVATE otb1::otb1)
+```
+
+**Check records with the C++ decoder** instead of the schema:
+
+```bash
+./build/otb1_check examples/*.json
+./build/otb1_check ledger-2025.jsonl
+./build/otb1_check --expect-invalid tests/invalid/*.json
+```
+
+### Two implementations, held to one answer
+
+The schema and the C++ decoder are two descriptions of the same format, and
+two descriptions drift unless something forces them together. Three things
+do:
+
+- **One corpus.** The C++ tests run over this repository's own `examples/`
+  and `tests/invalid/`, the same files the schema is validated against.
+- **Differential testing.** [`tools/differential.py`](tools/differential.py)
+  mutates the example records about 8,800 ways (a field dropped, a field
+  added, a value swapped for another type, another enum value, a boundary
+  number, a malformed id or timestamp) and requires the schema and the C++
+  decoder to give the same accept-or-reject verdict on every one. For each
+  record both accept, the C++ re-encoding must say exactly what the input
+  said: a cost that came back rounded would be a different claim. It then
+  mutates JSON text at the byte level, about 46,000 inputs, and requires
+  the C++ parser to accept exactly what a strict RFC 8259 reader accepts.
+- **CI runs all of it** on every push and pull request, and builds the
+  library on Linux and Windows.
+
+```bash
+python tools/differential.py        # needs build/otb1_check
+```
 
 ## Core OTB‑1 JSON Schema
 ```json
@@ -62,7 +160,7 @@ this on every push and PR.
 ## Field Definitions
 - `version`: must be `"OTB-1"`.
 - `timestamp`: UTC ISO timestamp of purchase/contract execution.
-- `investment`: object describing ID, category, item, and current status (`planned`, `in-progress`, `completed`).
+- `investment`: object describing ID, category, item, and current status (`planned`, `in-progress`, `procurement`, `completed`).
 - `financials`:
   - `costUSD` → total cost
   - `vendor` → vendor/dealer/contractor

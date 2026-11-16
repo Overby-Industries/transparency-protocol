@@ -1,0 +1,13 @@
+# CMake
+build/
+build-*/
+
+# Compiler output (MSVC)
+*.obj
+*.exe
+*.pdb
+*.ilk
+
+# Python
+__pycache__/
+*.pyc
