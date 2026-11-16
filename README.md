@@ -1,4 +1,14 @@
 # OTB‑1: Overby Transparency for Business v1
+
+[![Version](https://img.shields.io/badge/Version-OTB--1-blue?style=for-the-badge&logo=github)](schema/otb-1.schema.json)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Overby-Industries/transparency-protocol/validate.yml?branch=main&style=for-the-badge&label=Validate&logo=githubactions&logoColor=white)](https://github.com/Overby-Industries/transparency-protocol/actions/workflows/validate.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-lightgrey?style=for-the-badge&logo=apache)](LICENSE)
+[![JSON Schema](https://img.shields.io/badge/JSON_Schema-Draft_2020--12-purple?style=for-the-badge&logo=json)](https://json-schema.org/draft/2020-12/release-notes)
+[![Certification](https://img.shields.io/badge/Certification-OTB_Audit_%7C_PoI-green?style=for-the-badge)](#certifications--extensions)
+[![Status](https://img.shields.io/badge/Status-Draft-orange?style=for-the-badge)](#formal-schema--validation)
+
+**Overby Industries – Business Transparency Protocol Specification**
+
 OTB‑1 defines the standard JSON schema for publicly reporting business expenditures, infrastructure projects, and material procurements.
 
 ## Purpose
