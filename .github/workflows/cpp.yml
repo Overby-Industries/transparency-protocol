@@ -1,0 +1,57 @@
+name: C++ Reference Implementation
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+  differential:
+    name: C++ decoder agrees with the JSON Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install jsonschema
+        run: pip install jsonschema
+
+      - name: Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+
+      - name: C++ decoder accepts every example
+        run: ./build/otb1_check examples/*.json
+
+      - name: C++ decoder rejects every malformed record
+        run: ./build/otb1_check --expect-invalid tests/invalid/*.json
+
+      # The two implementations of OTB-1 in this repository are fed the same
+      # thousands of mutated records and must give the same verdict
+      # on every one. See tools/differential.py.
+      - name: Schema and C++ decoder agree on mutated records
+        run: python tools/differential.py

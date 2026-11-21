@@ -1,0 +1,27 @@
+{
+  "version": "OTB-1",
+  "timestamp": "2025-03-14T14:00:00Z",
+  "investment": {
+    "id": "INV-2025-0001",
+    "type": "land",
+    "item": "50 acres for Overby Airfield Development",
+    "status": "completed"
+  },
+  "financials": {
+    "costUSD": -1,
+    "vendor": "AeroLand Realty LLC",
+    "fundingSource": "Early Supporter Funds"
+  },
+  "location": {
+    "site": "West Texas",
+    "coordinates": {
+      "lat": 31.9686,
+      "lon": -99.9018
+    }
+  },
+  "certifications": {
+    "SMESSC_Applicable": false,
+    "OTB_Audit": true,
+    "ProofOfInvestmentToken": "0xinv20250001"
+  }
+}
